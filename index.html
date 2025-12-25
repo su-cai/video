@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>手机端美女图片展示（放大播放按钮+红色描边·深灰偏黑底色）</title>
+    <!-- 引入Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* 全局样式：重置+深灰偏黑布局 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background-color: #1a1a1a; /* 深灰色偏黑（柔和不刺眼，高级感拉满） */
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            min-height: 120vh; /* 强制页面高度超过可视区域，确保有滚动条（关键修复） */
+        }
+
+        /* 16:9比例容器（轮播/底部大图专用） */
+        .aspect-ratio-16-9 {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9核心比例 */
+            overflow: hidden;
+            border-radius: 16px;
+            cursor: pointer;
+        }
+        .aspect-ratio-16-9 img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 4:3比例容器（小图专用） */
+        .aspect-ratio-4-3 {
+            position: relative;
+            width: 100%;
+            padding-top: 75%; /* 4:3核心比例 */
+            overflow: hidden;
+            border-radius: 16px;
+            cursor: pointer;
+        }
+        .aspect-ratio-4-3 img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 播放按钮样式：放大尺寸+红色描边+三角形完美居中 */
+        /* 播放按钮容器（居中定位+放大+红色描边） */
+        .img-clickable::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.6);
+            border: 2px solid #ff4444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+        /* 播放按钮三角图标（同步放大+完美居中） */
+        .img-clickable::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-45%, -50%);
+            border-style: solid;
+            border-width: 18px 0 18px 30px;
+            border-color: transparent transparent transparent #ffffff;
+            z-index: 11;
+            transition: all 0.3s ease;
+        }
+        /* 小图播放按钮适配（同步放大+红色描边） */
+        .aspect-ratio-4-3.img-clickable::after {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #ff4444;
+        }
+        .aspect-ratio-4-3.img-clickable::before {
+            border-width: 12px 0 12px 22px;
+            transform: translate(-45%, -50%);
+        }
+        /* hover效果：同步放大，保持样式一致 */
+        .img-clickable:hover::after {
+            transform: translate(-50%, -50%) scale(1.1);
+            background-color: rgba(0, 0, 0, 0.8);
+            border-color: #ff3333;
+        }
+        .img-clickable:hover::before {
+            transform: translate(-45%, -50%) scale(1.1);
+        }
+
+        /* 轮播样式：补充核心样式，确保兼容所有浏览器（关键优化） */
+        .carousel {
+            width: 100%;
+            padding: 0 8px;
+            margin-bottom: 10px;
+            position: relative; /* 相对定位，作为轮播项绝对定位的容器 */
+            overflow: hidden !important; /* 隐藏溢出内容，防止三张图片同时显示 */
+        }
+        .carousel-inner {
+            position: relative; /* 相对定位 */
+            width: 100%;
+            overflow: hidden !important; /* 隐藏溢出的轮播项 */
+        }
+        .carousel-item {
+            position: absolute !important; /* 绝对定位，让轮播项重叠 */
+            top: 0;
+            left: 0;
+            width: 100%;
+            opacity: 0; /* 默认隐藏 */
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out !important;
+        }
+        .carousel-item.active {
+            position: relative !important; /* 活跃项改为相对定位，正常显示 */
+            opacity: 1; /* 显示活跃项 */
+            z-index: 1; /* 置顶显示 */
+        }
+        /* 圆形指示点：强制正圆 */
+        .carousel-indicators {
+            justify-content: flex-end;
+            bottom: 20px;
+            right: 18px;
+            left: auto;
+            margin: 0;
+            gap: 8px;
+            display: flex;
+            align-items: center;
+            position: absolute; /* 绝对定位，不影响轮播布局 */
+            z-index: 2; /* 置顶显示 */
+        }
+        .carousel-indicators button {
+            width: 10px !important;
+            height: 10px !important;
+            border-radius: 50% !important;
+            background-color: rgba(255,255,255,0.5) !important;
+            border: none !important;
+            opacity: 1 !important;
+            flex: none !important;
+            box-shadow: none !important;
+        }
+        .carousel-indicators button.active {
+            background-color: #fff !important;
+            transform: scale(1.2) !important;
+        }
+
+        /* 两列小图：紧凑不乱 */
+        .img-container {
+            padding: 0 10px;
+            margin-bottom: 15px; /* 与底部16:9图片保持间距 */
+        }
+        .img-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .img-col {
+            width: calc(50% - 4px);
+        }
+        /* 图片卡片：与深色背景协调适配 */
+        .img-card {
+            background-color: #2d2d2d;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .img-desc {
+            padding: 10px 12px;
+            font-size: 14px;
+            color: #f0f0f0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 底部16:9图片容器：与轮播图样式统一 */
+        .bottom-big-img {
+            padding: 0 10px;
+            margin-bottom: 50px; /* 增大底部间距，确保页面可滚动到底（关键修复） */
+        }
+
+        /* 付费弹窗样式：适配深色背景+手机端左右留白 */
+        /* 弹窗容器：添加左右间距，限制最大宽度，避免贴屏幕边缘 */
+        .modal-dialog {
+            margin: 0 auto;
+            padding: 0 16px !important; /* 手机端左右16px留白 */
+            max-width: 320px !important; /* 限制弹窗最大宽度 */
+        }
+        .modal-content {
+            background-color: #2d2d2d;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            color: #f0f0f0;
+            width: 100%; /* 适配容器宽度 */
+        }
+        .modal-header {
+            border-bottom: 1px solid #444;
+            padding: 16px 20px;
+            justify-content: center;
+        }
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+        }
+        .modal-body {
+            padding: 20px;
+            text-align: center;
+        }
+        .pay-qrcode {
+            width: 180px; /* 适配窄弹窗，缩小二维码 */
+            height: 180px;
+            margin: 0 auto 16px;
+            border: 4px solid #fff;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .pay-qrcode img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .pay-tip {
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #f0f0f0;
+        }
+        .pay-price {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff4444;
+            margin-bottom: 16px;
+        }
+        /* 调亮解锁提示文字：自定义样式类 */
+        .unlock-tip {
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+        .modal-footer {
+            border-top: 1px solid #444;
+            padding: 12px 20px;
+            justify-content: center;
+        }
+        .modal-footer .btn {
+            background-color: #ff4444;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 24px;
+            font-size: 14px;
+        }
+        .modal-footer .btn:hover {
+            background-color: #ff3333;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <!-- 轮播区域：移除data-bs-ride="carousel"，改为手动初始化 -->
+    <div id="carouselExampleIndicators" class="carousel slide">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <div class="aspect-ratio-16-9 img-clickable">
+                    <!-- 轮播图1：根目录本地图片 -->
+                    <img src="carousel_1.jpg" alt="御姐风美女1">
+                </div>
+            </div>
+            <div class="carousel-item">
+                <div class="aspect-ratio-16-9 img-clickable">
+                    <!-- 轮播图2：根目录本地图片 -->
+                    <img src="carousel_2.jpg" alt="御姐风美女2">
+                </div>
+            </div>
+            <div class="carousel-item">
+                <div class="aspect-ratio-16-9 img-clickable">
+                    <!-- 轮播图3：根目录本地图片 -->
+                    <img src="carousel_3.jpg" alt="气质美女3">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 两列小图：4:3比例+紧凑布局+卡片样式（每列8张） -->
+    <div class="img-container">
+        <!-- 第1行 -->
+        <div class="img-row">
+            <div class="img-col">
+                <div class="img-card">
+                    <div class="aspect-ratio-4-3 img-clickable">
+                        <!-- 小图1：根目录本地图片 -->
+                        <img src="small_1.jpg" alt="可爱美女1">
+                    </div>
+                    <div class="img-desc">可爱小姐姐①</div>
+                </div>
+            </div>
+            <div class="img-col">
+                <div class="img-card">
+                    <div class="aspect-ratio-4-3 img-clickable">
+                        <!-- 小图2：根目录本地图片 -->
+                        <img src="small_2.jpg" alt="御姐风美女5">
+                    </div>
+                    <div class="img-desc">御姐风小姐姐⑤</div>
+                </div>
+            </div>
+        </div>
+        <!-- 第2行 -->
+        <div class="img-row">
+            <div class="img-col">
+                <div class="img-card">
+                    <div class="aspect-ratio-4-3 img-clickable">
+                        <!-- 小图3：根目录本地图片 -->
+                        <img src="small_3.jpg" alt="可爱美女2">
+                    </div>
+                    <div class="img-desc">可爱小姐姐②</div>
+                </div>
+            </div>
+            <div class="img-col">
+                <div class="img-card">
+                    <div class="aspect-ratio-4-3 img-clickable">
+                        <!-- 小图4：根目录本地图片 -->
+                        <img src="small_4.jpg" alt="御姐风美女6">
+                    </div>
+                    <div class="img-desc">御姐风小姐姐⑥</div>
+                </div>
+            </div>
+        </div>
+        <!-- 第3行 -->
+        <div class="img-row">
+            <div class="img-col">
+                <div class="img-card">
+                    <div class="aspect-ratio-4-3 img-clickable">
+                        <!-- 小图5：根目录本地图片 -->
+                        <img src="small_5.jpg" alt="可爱美女3">
+                    </div>
+                    <div class="img-desc">可爱小姐姐③</div>
+                </div>
+            </div>
+            <div class="img-col">
+                <div class="img-card">
+                    <div class="aspect-ratio-4-3 img-clickable">
+                        <!-- 小图6：根目录本地图片 -->
+                        <img src="small_6.jpg" alt="御姐风美女7">
+                    </div>
+                    <div class="img-desc">御姐风小姐姐⑦</div>
+                </div>
+            </div>
+        </div>
+        <!-- 第4行 -->
+        <div class="img-row">
+            <div class="img-col">
+                <div class="img-card">
+                    <div class="aspect-ratio-4-3 img-clickable">
+                        <!-- 小图7：根目录本地图片 -->
+                        <img src="small_7.jpg" alt="可爱美女4">
+                    </div>
+                    <div class="img-desc">可爱小姐姐④</div>
+                </div>
+            </div>
+            <div class="img-col">
+                <div class="img-card">
+                    <div class="aspect-ratio-4-3 img-clickable">
+                        <!-- 小图8：根目录本地图片 -->
+                        <img src="small_8.jpg" alt="御姐风美女8">
+                    </div>
+                    <div class="img-desc">御姐风小姐姐⑧</div>
+                </div>
+            </div>
+        </div>
+        <!-- 第5行 -->
+        <div class="img-row">
+            <div class="img-col">
+                <div class="img-card">
+                    <div class="aspect-ratio-4-3 img-clickable">
+                        <!-- 小图9：根目录本地图片 -->
+                        <img src="small_9.jpg" alt="可爱美女5">
+                    </div>
+                    <div class="img-desc">可爱小姐姐⑤</div>
+                </div>
+            </div>
+            <div class="img-col">
+                <div class="img-card">
+                    <div class="aspect-ratio-4-3 img-clickable">
+                        <!-- 小图10：根目录本地图片 -->
+                        <img src="small_10.jpg" alt="御姐风美女9">
+                    </div>
+                    <div class="img-desc">御姐风小姐姐⑨</div>
+                </div>
+            </div>
+        </div>
+        <!-- 第6行 -->
+        <div class="img-row">
+            <div class="img-col">
+                <div class="img-card">
+                    <div class="aspect-ratio-4-3 img-clickable">
+                        <!-- 小图11：根目录本地图片 -->
+                        <img src="small_11.jpg" alt="可爱美女6">
+                    </div>
+                    <div class="img-desc">可爱小姐姐⑥</div>
+                </div>
+            </div>
+            <div class="img-col">
+                <div class="img-card">
+                    <div class="aspect-ratio-4-3 img-clickable">
+                        <!-- 小图12：根目录本地图片 -->
+                        <img src="small_12.jpg" alt="御姐风美女10">
+                    </div>
+                    <div class="img-desc">御姐风小姐姐⑩</div>
+                </div>
+            </div>
+        </div>
+        <!-- 第7行 -->
+        <div class="img-row">
+            <div class="img-col">
+                <div class="img-card">
+                    <div class="aspect-ratio-4-3 img-clickable">
+                        <!-- 小图13：根目录本地图片 -->
+                        <img src="small_13.jpg" alt="可爱美女7">
+                    </div>
+                    <div class="img-desc">可爱小姐姐⑦</div>
+                </div>
+            </div>
+            <div class="img-col">
+                <div class="img-card">
+                    <div class="aspect-ratio-4-3 img-clickable">
+                        <!-- 小图14：根目录本地图片 -->
+                        <img src="small_14.jpg" alt="御姐风美女11">
+                    </div>
+                    <div class="img-desc">御姐风小姐姐⑪</div>
+                </div>
+            </div>
+        </div>
+        <!-- 第8行 -->
+        <div class="img-row">
+            <div class="img-col">
+                <div class="img-card">
+                    <div class="aspect-ratio-4-3 img-clickable">
+                        <!-- 小图15：根目录本地图片 -->
+                        <img src="small_15.jpg" alt="可爱美女8">
+                    </div>
+                    <div class="img-desc">可爱小姐姐⑧</div>
+                </div>
+            </div>
+            <div class="img-col">
+                <div class="img-card">
+                    <div class="aspect-ratio-4-3 img-clickable">
+                        <!-- 小图16：根目录本地图片 -->
+                        <img src="small_16.jpg" alt="御姐风美女12">
+                    </div>
+                    <div class="img-desc">御姐风小姐姐⑫</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部16:9图片：与轮播图样式统一，带播放按钮 -->
+    <div class="bottom-big-img">
+        <div class="aspect-ratio-16-9 img-clickable">
+            <!-- 底部大图：根目录本地图片 -->
+            <img src="bottom_big.jpg" alt="气质美女合集（底部大图）">
+        </div>
+    </div>
+
+    <!-- 付费弹窗（Bootstrap模态框） -->
+    <div class="modal fade" id="payModal" tabindex="-1" aria-labelledby="payModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="payModalLabel">解锁全部精彩内容</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="pay-qrcode">
+                        <!-- 弹窗二维码：根目录本地图片 -->
+                        <img src="pay_qrcode.png" alt="付费二维码">
+                    </div>
+                    <p class="pay-tip">扫码付费解锁</p>
+                    <p class="pay-price">¥9.9</p>
+                    <p class="unlock-tip">付费后即可解锁全部内容</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-bs-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入JS：确保Popper.js先加载，Bootstrap JS后加载 -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script>
+        // 页面加载完成后初始化（确保DOM完全渲染）
+        document.addEventListener('DOMContentLoaded', function() {
+            const clickableImgs = document.querySelectorAll('.img-clickable');
+            const payModal = new bootstrap.Modal(document.getElementById('payModal'));
+            let hasTriggered = false; // 防重复触发标记
+            let lastScrollTop = 0; // 记录上一次滚动位置，用于判断滚动方向
+
+            // 1. 手动初始化轮播（解决自动初始化兼容性问题）
+            const carousel = new bootstrap.Carousel(document.getElementById('carouselExampleIndicators'), {
+                interval: 3000, // 轮播间隔3秒
+                pause: 'hover', // 鼠标悬停暂停轮播（移动端无效）
+                wrap: true // 循环轮播
+            });
+
+            // 2. 图片点击触发弹窗（保留原有功能）
+            clickableImgs.forEach(function(imgContainer) {
+                imgContainer.addEventListener('click', function() {
+                    payModal.show();
+                });
+            });
+
+            // 3. 精准触底判断函数（兼容所有浏览器）
+            function checkIsAtBottom() {
+                const scrollTop = window.scrollY || document.documentElement.scrollTop;
+                const clientHeight = window.innerHeight || document.documentElement.clientHeight;
+                const scrollHeight = Math.max(
+                    document.body.scrollHeight,
+                    document.documentElement.scrollHeight
+                );
+                // 距离底部20px内即视为“触底”
+                return (scrollTop + clientHeight) >= (scrollHeight - 20);
+            }
+
+            // 4. 延迟初始化滚动监听（避免页面未渲染完成误触发弹窗）
+            setTimeout(function() {
+                window.addEventListener('scroll', function() {
+                    const currentScrollTop = window.scrollY || document.documentElement.scrollTop;
+                    const isAtBottom = checkIsAtBottom();
+                    // 判断滚动方向：currentScrollTop > lastScrollTop 为向下滚动，反之向上
+                    const isScrollingDown = currentScrollTop > lastScrollTop;
+
+                    // 触发条件：向下滚动 + 已触底 + 未触发过弹窗
+                    if (isScrollingDown && isAtBottom && !hasTriggered) {
+                        payModal.show();
+                        hasTriggered = true; // 标记已触发，避免重复弹出
+                    }
+
+                    // 仅当向上滚动且离开底部一定距离（50px），才重置触发标记
+                    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+                    const clientHeight = window.innerHeight || document.documentElement.clientHeight;
+                    const scrollHeight = Math.max(
+                        document.body.scrollHeight,
+                        document.documentElement.scrollHeight
+                    );
+                    const isAwayFromBottom = (scrollTop + clientHeight) < (scrollHeight - 50);
+                    if (isAwayFromBottom) {
+                        hasTriggered = false;
+                    }
+
+                    // 更新上一次滚动位置
+                    lastScrollTop = currentScrollTop;
+                });
+            }, 500); // 延迟500毫秒，确保页面完全渲染
+
+            // 5. 弹窗关闭后，仅当离开底部才重置标记（避免在底部关闭弹窗后立即触发）
+            document.getElementById('payModal').addEventListener('hidden.bs.modal', function() {
+                const isAwayFromBottom = (window.scrollY + window.innerHeight) < (Math.max(document.body.scrollHeight, document.documentElement.scrollHeight) - 50);
+                if (isAwayFromBottom) {
+                    hasTriggered = false;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
