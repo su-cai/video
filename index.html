@@ -7,17 +7,26 @@
     <!-- 引入Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* 全局样式：重置+深灰偏黑布局 */
+        /* 全局样式：重置+深灰偏黑布局+强制禁止所有文字选择（兼容所有浏览器） */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            /* 核心：禁止文本选择，兼容多浏览器 */
+            user-select: none;
+            -webkit-user-select: none; /* Chrome/Safari/Opera */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* IE/Edge */
         }
-        body {
+        html, body {
             background-color: #1a1a1a; /* 深灰色偏黑（柔和不刺眼，高级感拉满） */
             font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
             min-height: 120vh; /* 强制页面高度超过可视区域，确保有滚动条（关键修复） */
-            user-select: none; /* 全局禁止文本选择，间接防止图片误选 */
+            /* 强化根元素禁止文本选择 */
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
 
         /* 非二维码图片防保存核心样式（关键优化） */
@@ -216,7 +225,11 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            user-select: none; /* 禁止描述文字选择 */
+            /* 强化禁止文本选择 */
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
 
         /* 底部16:9图片容器：与轮播图样式统一 */
@@ -239,6 +252,11 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.5);
             color: #f0f0f0;
             width: 100%; /* 适配容器宽度 */
+            /* 弹窗内文字禁止选择 */
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
         .modal-header {
             border-bottom: 1px solid #444;
@@ -267,7 +285,7 @@
             overflow: hidden;
             position: relative; /* 稳定布局 */
         }
-        /* 二维码图片：块级化+自身居中+填充容器（修复核心） */
+        /* 二维码图片：块级化+自身居中+填充容器（修复核心）+ 仅允许二维码操作 */
         .qrcode-img {
             display: block; /* 块级元素，支持margin居中 */
             margin: 0 auto; /* 图片自身水平居中 */
@@ -277,7 +295,7 @@
             -webkit-user-drag: auto;
             user-drag: auto;
             pointer-events: auto;
-            user-select: auto;
+            user-select: auto; /* 仅二维码允许选择（方便保存） */
         }
         .pay-tip {
             font-size: 16px;
@@ -307,6 +325,7 @@
             border-radius: 8px;
             padding: 8px 24px;
             font-size: 14px;
+            cursor: pointer;
         }
         .modal-footer .btn:hover {
             background-color: #ff3333;
@@ -641,6 +660,31 @@
                             }
                         });
                     }
+                }
+            });
+
+            // ========== 新增：JS拦截复制/选择行为，兜底禁止文字复制 ==========
+            // 拦截鼠标拖拽选择文本
+            document.addEventListener('selectstart', function(e) {
+                // 仅允许二维码区域选择，其他区域禁止
+                if (!e.target.closest('.pay-qrcode')) {
+                    e.preventDefault();
+                }
+            });
+
+            // 拦截快捷键复制（Ctrl+C/Command+C）
+            document.addEventListener('keydown', function(e) {
+                // 仅允许二维码区域使用复制快捷键，其他区域禁止
+                if (!e.target.closest('.pay-qrcode') && ((e.ctrlKey && e.key === 'c') || (e.metaKey && e.key === 'c'))) {
+                    e.preventDefault();
+                }
+            });
+
+            // 拦截右键菜单（防止通过右键复制文字）
+            document.addEventListener('contextmenu', function(e) {
+                // 仅允许二维码区域显示右键菜单，其他区域禁止
+                if (!e.target.closest('.pay-qrcode')) {
+                    e.preventDefault();
                 }
             });
         });
