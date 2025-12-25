@@ -225,7 +225,7 @@
             margin-bottom: 50px; /* 增大底部间距，确保页面可滚动到底（关键修复） */
         }
 
-        /* 付费弹窗样式：适配深色背景+手机端左右留白 */
+        /* 付费弹窗样式：适配深色背景+手机端左右留白（修复二维码居中） */
         /* 弹窗容器：添加左右间距，限制最大宽度，避免贴屏幕边缘 */
         .modal-dialog {
             margin: 0 auto;
@@ -250,20 +250,30 @@
             font-weight: 600;
             color: #fff;
         }
+        /* 弹窗主体：强化居中，消除默认边距干扰 */
         .modal-body {
+            text-align: center; /* 兜底居中 */
             padding: 20px;
-            text-align: center;
+            margin: 0; /* 消除默认边距 */
         }
+        /* 二维码容器：块级化+强制水平居中 */
         .pay-qrcode {
+            display: block; /* 关键：确保margin: 0 auto生效 */
             width: 180px; /* 适配窄弹窗，缩小二维码 */
             height: 180px;
-            margin: 0 auto 16px;
+            margin: 0 auto 16px; /* 水平居中+底部间距 */
             border: 4px solid #fff;
             border-radius: 12px;
             overflow: hidden;
+            position: relative; /* 稳定布局 */
         }
-        /* 二维码图片：添加专属类，允许保存 */
+        /* 二维码图片：块级化+自身居中+填充容器（修复核心） */
         .qrcode-img {
+            display: block; /* 块级元素，支持margin居中 */
+            margin: 0 auto; /* 图片自身水平居中 */
+            width: 100%; /* 填充容器宽度 */
+            height: 100%; /* 填充容器高度 */
+            object-fit: cover; /* 保持图片比例，无变形 */
             -webkit-user-drag: auto;
             user-drag: auto;
             pointer-events: auto;
@@ -523,7 +533,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="pay-qrcode">
-                        <!-- 弹窗二维码：添加.qrcode-img类，允许保存 -->
+                        <!-- 弹窗二维码：添加.qrcode-img类，允许保存+居中显示 -->
                         <img src="pay_qrcode.png" alt="付费二维码" class="qrcode-img">
                     </div>
                     <p class="pay-tip">扫码付费解锁</p>
