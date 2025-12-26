@@ -92,7 +92,6 @@
         }
 
         /* 播放按钮样式：放大尺寸+红色描边+三角形完美居中 */
-        /* 播放按钮容器（居中定位+放大+红色描边） */
         .img-clickable::after {
             content: "";
             position: absolute;
@@ -110,7 +109,6 @@
             z-index: 10;
             transition: all 0.3s ease;
         }
-        /* 播放按钮三角图标（同步放大+完美居中） */
         .img-clickable::before {
             content: "";
             position: absolute;
@@ -123,7 +121,6 @@
             z-index: 11;
             transition: all 0.3s ease;
         }
-        /* 小图播放按钮适配（同步放大+红色描边） */
         .aspect-ratio-4-3.img-clickable::after {
             width: 50px;
             height: 50px;
@@ -133,7 +130,6 @@
             border-width: 12px 0 12px 22px;
             transform: translate(-45%, -50%);
         }
-        /* hover效果：同步放大，保持样式一致 */
         .img-clickable:hover::after {
             transform: translate(-50%, -50%) scale(1.1);
             background-color: rgba(0, 0, 0, 0.8);
@@ -143,33 +139,25 @@
             transform: translate(-45%, -50%) scale(1.1);
         }
 
-        /* 轮播样式：补充核心样式，确保兼容所有浏览器（关键优化） */
+        /* 轮播样式：彻底简化，仅保留必要样式，不干扰原生逻辑（关键修复） */
         .carousel {
             width: 100%;
             padding: 0 8px;
             margin-bottom: 10px;
-            position: relative; /* 相对定位，作为轮播项绝对定位的容器 */
-            overflow: hidden !important; /* 隐藏溢出内容，防止三张图片同时显示 */
+            position: relative;
         }
+        /* 兜底轮播容器高度，避免图片加载延迟导致轮播失效 */
         .carousel-inner {
-            position: relative; /* 相对定位 */
+            position: relative;
             width: 100%;
-            overflow: hidden !important; /* 隐藏溢出的轮播项 */
+            overflow: hidden;
+            min-height: 200px; /* 兜底高度，确保轮播逻辑正常运行 */
         }
+        /* 完全保留Bootstrap原生轮播项样式，不做任何自定义修改 */
         .carousel-item {
-            position: absolute !important; /* 绝对定位，让轮播项重叠 */
-            top: 0;
-            left: 0;
-            width: 100%;
-            opacity: 0; /* 默认隐藏 */
-            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out !important;
+            transition: transform 0.6s ease-in-out;
         }
-        .carousel-item.active {
-            position: relative !important; /* 活跃项改为相对定位，正常显示 */
-            opacity: 1; /* 显示活跃项 */
-            z-index: 1; /* 置顶显示 */
-        }
-        /* 圆形指示点：强制正圆 */
+        /* 圆形指示点样式，不干扰轮播功能 */
         .carousel-indicators {
             justify-content: flex-end;
             bottom: 20px;
@@ -177,10 +165,8 @@
             left: auto;
             margin: 0;
             gap: 8px;
-            display: flex;
-            align-items: center;
-            position: absolute; /* 绝对定位，不影响轮播布局 */
-            z-index: 2; /* 置顶显示 */
+            position: absolute;
+            z-index: 2;
         }
         .carousel-indicators button {
             width: 10px !important;
@@ -200,7 +186,7 @@
         /* 两列小图：紧凑不乱 */
         .img-container {
             padding: 0 10px;
-            margin-bottom: 15px; /* 与底部16:9图片保持间距 */
+            margin-bottom: 15px;
         }
         .img-row {
             display: flex;
@@ -211,7 +197,6 @@
         .img-col {
             width: calc(50% - 4px);
         }
-        /* 图片卡片：与深色背景协调适配 */
         .img-card {
             background-color: #2d2d2d;
             border-radius: 12px;
@@ -225,25 +210,23 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            /* 强化禁止文本选择 */
             user-select: none;
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
         }
 
-        /* 底部16:9图片容器：与轮播图样式统一 */
+        /* 底部16:9图片容器 */
         .bottom-big-img {
             padding: 0 10px;
-            margin-bottom: 50px; /* 增大底部间距，确保页面可滚动到底（关键修复） */
+            margin-bottom: 50px;
         }
 
-        /* 付费弹窗样式：适配深色背景+手机端左右留白（修复二维码居中） */
-        /* 弹窗容器：添加左右间距，限制最大宽度，避免贴屏幕边缘 */
+        /* 付费弹窗样式 */
         .modal-dialog {
             margin: 0 auto;
-            padding: 0 16px !important; /* 手机端左右16px留白 */
-            max-width: 320px !important; /* 限制弹窗最大宽度 */
+            padding: 0 16px !important;
+            max-width: 320px !important;
         }
         .modal-content {
             background-color: #2d2d2d;
@@ -251,8 +234,7 @@
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.5);
             color: #f0f0f0;
-            width: 100%; /* 适配容器宽度 */
-            /* 弹窗内文字禁止选择 */
+            width: 100%;
             user-select: none;
             -webkit-user-select: none;
             -moz-user-select: none;
@@ -268,34 +250,31 @@
             font-weight: 600;
             color: #fff;
         }
-        /* 弹窗主体：强化居中，消除默认边距干扰 */
         .modal-body {
-            text-align: center; /* 兜底居中 */
+            text-align: center;
             padding: 20px;
-            margin: 0; /* 消除默认边距 */
+            margin: 0;
         }
-        /* 二维码容器：块级化+强制水平居中 */
         .pay-qrcode {
-            display: block; /* 关键：确保margin: 0 auto生效 */
-            width: 180px; /* 适配窄弹窗，缩小二维码 */
+            display: block;
+            width: 180px;
             height: 180px;
-            margin: 0 auto 16px; /* 水平居中+底部间距 */
+            margin: 0 auto 16px;
             border: 4px solid #fff;
             border-radius: 12px;
             overflow: hidden;
-            position: relative; /* 稳定布局 */
+            position: relative;
         }
-        /* 二维码图片：块级化+自身居中+填充容器（修复核心）+ 仅允许二维码操作 */
         .qrcode-img {
-            display: block; /* 块级元素，支持margin居中 */
-            margin: 0 auto; /* 图片自身水平居中 */
-            width: 100%; /* 填充容器宽度 */
-            height: 100%; /* 填充容器高度 */
-            object-fit: cover; /* 保持图片比例，无变形 */
+            display: block;
+            margin: 0 auto;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
             -webkit-user-drag: auto;
             user-drag: auto;
             pointer-events: auto;
-            user-select: auto; /* 仅二维码允许选择（方便保存） */
+            user-select: auto;
         }
         .pay-tip {
             font-size: 16px;
@@ -308,7 +287,6 @@
             color: #ff4444;
             margin-bottom: 16px;
         }
-        /* 调亮解锁提示文字：自定义样式类 */
         .unlock-tip {
             color: #e0e0e0;
             font-size: 14px;
@@ -334,43 +312,39 @@
     </style>
 </head>
 <body>
-    <!-- 轮播区域：移除data-bs-ride="carousel"，改为手动初始化 -->
-    <div id="carouselExampleIndicators" class="carousel slide">
+    <!-- 轮播区域：保留双重保障，移除网络图片兜底 -->
+    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-indicators">
             <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
             <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
             <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
         </div>
         <div class="carousel-inner">
-            <div class="carousel-item active">
+            <div class="carousel-item active" data-bs-interval="3000">
                 <div class="aspect-ratio-16-9 img-clickable">
-                    <!-- 轮播图1：根目录本地图片（防保存） -->
                     <img src="carousel_1.jpg" alt="精品素材①">
                 </div>
             </div>
-            <div class="carousel-item">
+            <div class="carousel-item" data-bs-interval="3000">
                 <div class="aspect-ratio-16-9 img-clickable">
-                    <!-- 轮播图2：根目录本地图片（防保存） -->
                     <img src="carousel_2.jpg" alt="精品素材②">
                 </div>
             </div>
-            <div class="carousel-item">
+            <div class="carousel-item" data-bs-interval="3000">
                 <div class="aspect-ratio-16-9 img-clickable">
-                    <!-- 轮播图3：根目录本地图片（防保存） -->
                     <img src="carousel_3.jpg" alt="精品素材③">
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 两列小图：4:3比例+紧凑布局+卡片样式（每列8张） -->
+    <!-- 两列小图：修正序号与本地图片匹配，移除网络图片兜底 -->
     <div class="img-container">
         <!-- 第1行 -->
         <div class="img-row">
             <div class="img-col">
                 <div class="img-card">
                     <div class="aspect-ratio-4-3 img-clickable">
-                        <!-- 小图1：根目录本地图片（防保存） -->
                         <img src="small_1.jpg" alt="通用素材①">
                     </div>
                     <div class="img-desc">通用素材①</div>
@@ -379,10 +353,9 @@
             <div class="img-col">
                 <div class="img-card">
                     <div class="aspect-ratio-4-3 img-clickable">
-                        <!-- 小图2：根目录本地图片（防保存） -->
-                        <img src="small_2.jpg" alt="通用素材⑤">
+                        <img src="small_2.jpg" alt="通用素材②">
                     </div>
-                    <div class="img-desc">通用素材2</div>
+                    <div class="img-desc">通用素材②</div> <!-- 原⑤修正为② -->
                 </div>
             </div>
         </div>
@@ -391,19 +364,17 @@
             <div class="img-col">
                 <div class="img-card">
                     <div class="aspect-ratio-4-3 img-clickable">
-                        <!-- 小图3：根目录本地图片（防保存） -->
-                        <img src="small_3.jpg" alt="通用素材②">
+                        <img src="small_3.jpg" alt="通用素材③">
                     </div>
-                    <div class="img-desc">通用素材②</div>
+                    <div class="img-desc">通用素材③</div> <!-- 原②修正为③ -->
                 </div>
             </div>
             <div class="img-col">
                 <div class="img-card">
                     <div class="aspect-ratio-4-3 img-clickable">
-                        <!-- 小图4：根目录本地图片（防保存） -->
-                        <img src="small_4.jpg" alt="通用素材⑥">
+                        <img src="small_4.jpg" alt="通用素材④">
                     </div>
-                    <div class="img-desc">通用素材⑥</div>
+                    <div class="img-desc">通用素材④</div> <!-- 原⑥修正为④ -->
                 </div>
             </div>
         </div>
@@ -412,19 +383,17 @@
             <div class="img-col">
                 <div class="img-card">
                     <div class="aspect-ratio-4-3 img-clickable">
-                        <!-- 小图5：根目录本地图片（防保存） -->
-                        <img src="small_5.jpg" alt="通用素材③">
+                        <img src="small_5.jpg" alt="通用素材⑤">
                     </div>
-                    <div class="img-desc">通用素材③</div>
+                    <div class="img-desc">通用素材⑤</div> <!-- 原③修正为⑤ -->
                 </div>
             </div>
             <div class="img-col">
                 <div class="img-card">
                     <div class="aspect-ratio-4-3 img-clickable">
-                        <!-- 小图6：根目录本地图片（防保存） -->
-                        <img src="small_6.jpg" alt="通用素材⑦">
+                        <img src="small_6.jpg" alt="通用素材⑥">
                     </div>
-                    <div class="img-desc">通用素材⑦</div>
+                    <div class="img-desc">通用素材⑥</div> <!-- 原⑦修正为⑥ -->
                 </div>
             </div>
         </div>
@@ -433,16 +402,14 @@
             <div class="img-col">
                 <div class="img-card">
                     <div class="aspect-ratio-4-3 img-clickable">
-                        <!-- 小图7：根目录本地图片（防保存） -->
-                        <img src="small_7.jpg" alt="通用素材④">
+                        <img src="small_7.jpg" alt="通用素材⑦">
                     </div>
-                    <div class="img-desc">通用素材④</div>
+                    <div class="img-desc">通用素材⑦</div> <!-- 原④修正为⑦ -->
                 </div>
             </div>
             <div class="img-col">
                 <div class="img-card">
                     <div class="aspect-ratio-4-3 img-clickable">
-                        <!-- 小图8：根目录本地图片（防保存） -->
                         <img src="small_8.jpg" alt="通用素材⑧">
                     </div>
                     <div class="img-desc">通用素材⑧</div>
@@ -454,7 +421,6 @@
             <div class="img-col">
                 <div class="img-card">
                     <div class="aspect-ratio-4-3 img-clickable">
-                        <!-- 小图9：根目录本地图片（防保存） -->
                         <img src="small_9.jpg" alt="通用素材⑨">
                     </div>
                     <div class="img-desc">通用素材⑨</div>
@@ -463,10 +429,9 @@
             <div class="img-col">
                 <div class="img-card">
                     <div class="aspect-ratio-4-3 img-clickable">
-                        <!-- 小图10：根目录本地图片（防保存） -->
-                        <img src="small_10.jpg" alt="通用素材⑬">
+                        <img src="small_10.jpg" alt="通用素材⑩">
                     </div>
-                    <div class="img-desc">通用素材⑬</div>
+                    <div class="img-desc">通用素材⑩</div> <!-- 原⑬修正为⑩ -->
                 </div>
             </div>
         </div>
@@ -475,19 +440,17 @@
             <div class="img-col">
                 <div class="img-card">
                     <div class="aspect-ratio-4-3 img-clickable">
-                        <!-- 小图11：根目录本地图片（防保存） -->
-                        <img src="small_11.jpg" alt="通用素材⑩">
+                        <img src="small_11.jpg" alt="通用素材⑪">
                     </div>
-                    <div class="img-desc">通用素材⑩</div>
+                    <div class="img-desc">通用素材⑪</div> <!-- 原⑩修正为⑪ -->
                 </div>
             </div>
             <div class="img-col">
                 <div class="img-card">
                     <div class="aspect-ratio-4-3 img-clickable">
-                        <!-- 小图12：根目录本地图片（防保存） -->
-                        <img src="small_12.jpg" alt="通用素材⑭">
+                        <img src="small_12.jpg" alt="通用素材⑫">
                     </div>
-                    <div class="img-desc">通用素材⑭</div>
+                    <div class="img-desc">通用素材⑫</div> <!-- 原⑭修正为⑫ -->
                 </div>
             </div>
         </div>
@@ -496,19 +459,17 @@
             <div class="img-col">
                 <div class="img-card">
                     <div class="aspect-ratio-4-3 img-clickable">
-                        <!-- 小图13：根目录本地图片（防保存） -->
-                        <img src="small_13.jpg" alt="通用素材⑪">
+                        <img src="small_13.jpg" alt="通用素材⑬">
                     </div>
-                    <div class="img-desc">通用素材⑪</div>
+                    <div class="img-desc">通用素材⑬</div> <!-- 原⑪修正为⑬ -->
                 </div>
             </div>
             <div class="img-col">
                 <div class="img-card">
                     <div class="aspect-ratio-4-3 img-clickable">
-                        <!-- 小图14：根目录本地图片（防保存） -->
-                        <img src="small_14.jpg" alt="通用素材⑮">
+                        <img src="small_14.jpg" alt="通用素材⑭">
                     </div>
-                    <div class="img-desc">通用素材⑮</div>
+                    <div class="img-desc">通用素材⑭</div> <!-- 原⑮修正为⑭ -->
                 </div>
             </div>
         </div>
@@ -517,16 +478,14 @@
             <div class="img-col">
                 <div class="img-card">
                     <div class="aspect-ratio-4-3 img-clickable">
-                        <!-- 小图15：根目录本地图片（防保存） -->
-                        <img src="small_15.jpg" alt="通用素材⑫">
+                        <img src="small_15.jpg" alt="通用素材⑮">
                     </div>
-                    <div class="img-desc">通用素材⑫</div>
+                    <div class="img-desc">通用素材⑮</div> <!-- 原⑫修正为⑮ -->
                 </div>
             </div>
             <div class="img-col">
                 <div class="img-card">
                     <div class="aspect-ratio-4-3 img-clickable">
-                        <!-- 小图16：根目录本地图片（防保存） -->
                         <img src="small_16.jpg" alt="通用素材⑯">
                     </div>
                     <div class="img-desc">通用素材⑯</div>
@@ -535,15 +494,14 @@
         </div>
     </div>
 
-    <!-- 底部16:9图片：与轮播图样式统一，带播放按钮 -->
+    <!-- 底部16:9图片：移除网络图片兜底 -->
     <div class="bottom-big-img">
         <div class="aspect-ratio-16-9 img-clickable">
-            <!-- 底部大图：根目录本地图片（防保存） -->
             <img src="bottom_big.jpg" alt="素材合集（底部大图）">
         </div>
     </div>
 
-    <!-- 付费弹窗（Bootstrap模态框） -->
+    <!-- 付费弹窗：移除二维码网络兜底 -->
     <div class="modal fade" id="payModal" tabindex="-1" aria-labelledby="payModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -552,7 +510,6 @@
                 </div>
                 <div class="modal-body">
                     <div class="pay-qrcode">
-                        <!-- 弹窗二维码：添加.qrcode-img类，允许保存+居中显示 -->
                         <img src="pay_qrcode.png" alt="付费二维码" class="qrcode-img">
                     </div>
                     <p class="pay-tip">扫码付费解锁</p>
@@ -566,32 +523,39 @@
         </div>
     </div>
 
-    <!-- 引入JS：确保Popper.js先加载，Bootstrap JS后加载 -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <!-- 引入JS：保留跨域兼容 -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
     <script>
-        // 页面加载完成后初始化（确保DOM完全渲染）
-        document.addEventListener('DOMContentLoaded', function() {
+        // 确保所有本地资源加载完成后执行
+        window.onload = function() {
             const clickableImgs = document.querySelectorAll('.img-clickable');
             const payModal = new bootstrap.Modal(document.getElementById('payModal'));
-            let hasTriggered = false; // 防重复触发标记
-            let lastScrollTop = 0; // 记录上一次滚动位置，用于判断滚动方向
+            let hasTriggered = false;
+            let lastScrollTop = 0;
 
-            // 1. 手动初始化轮播（解决自动初始化兼容性问题）
-            const carousel = new bootstrap.Carousel(document.getElementById('carouselExampleIndicators'), {
-                interval: 3000, // 轮播间隔3秒
-                pause: 'hover', // 鼠标悬停暂停轮播（移动端无效）
-                wrap: true // 循环轮播
-            });
+            // 手动初始化轮播，添加容错日志
+            let carousel;
+            try {
+                carousel = new bootstrap.Carousel(document.getElementById('carouselExampleIndicators'), {
+                    interval: 3000,
+                    pause: false,
+                    wrap: true,
+                    touch: true
+                });
+                console.log("轮播初始化成功！");
+            } catch (error) {
+                console.error("轮播初始化失败：", error);
+            }
 
-            // 2. 图片点击触发弹窗（保留原有功能）
+            // 图片点击触发弹窗
             clickableImgs.forEach(function(imgContainer) {
                 imgContainer.addEventListener('click', function() {
                     payModal.show();
                 });
             });
 
-            // 3. 精准触底判断函数（兼容所有浏览器）
+            // 精准触底判断函数
             function checkIsAtBottom() {
                 const scrollTop = window.scrollY || document.documentElement.scrollTop;
                 const clientHeight = window.innerHeight || document.documentElement.clientHeight;
@@ -599,25 +563,21 @@
                     document.body.scrollHeight,
                     document.documentElement.scrollHeight
                 );
-                // 距离底部20px内即视为“触底”
                 return (scrollTop + clientHeight) >= (scrollHeight - 20);
             }
 
-            // 4. 延迟初始化滚动监听（避免页面未渲染完成误触发弹窗）
+            // 延迟初始化滚动监听
             setTimeout(function() {
                 window.addEventListener('scroll', function() {
                     const currentScrollTop = window.scrollY || document.documentElement.scrollTop;
                     const isAtBottom = checkIsAtBottom();
-                    // 判断滚动方向：currentScrollTop > lastScrollTop 为向下滚动，反之向上
                     const isScrollingDown = currentScrollTop > lastScrollTop;
 
-                    // 触发条件：向下滚动 + 已触底 + 未触发过弹窗
                     if (isScrollingDown && isAtBottom && !hasTriggered) {
                         payModal.show();
-                        hasTriggered = true; // 标记已触发，避免重复弹出
+                        hasTriggered = true;
                     }
 
-                    // 仅当向上滚动且离开底部一定距离（50px），才重置触发标记
                     const scrollTop = window.scrollY || document.documentElement.scrollTop;
                     const clientHeight = window.innerHeight || document.documentElement.clientHeight;
                     const scrollHeight = Math.max(
@@ -629,12 +589,11 @@
                         hasTriggered = false;
                     }
 
-                    // 更新上一次滚动位置
                     lastScrollTop = currentScrollTop;
                 });
-            }, 500); // 延迟500毫秒，确保页面完全渲染
+            }, 500);
 
-            // 5. 弹窗关闭后，仅当离开底部才重置标记（避免在底部关闭弹窗后立即触发）
+            // 弹窗关闭后重置标记
             document.getElementById('payModal').addEventListener('hidden.bs.modal', function() {
                 const isAwayFromBottom = (window.scrollY + window.innerHeight) < (Math.max(document.body.scrollHeight, document.documentElement.scrollHeight) - 50);
                 if (isAwayFromBottom) {
@@ -642,19 +601,16 @@
                 }
             });
 
-            // 6. 精准拦截非二维码图片的右键菜单（核心：防止保存图片）
+            // 拦截非二维码图片右键
             const allImgs = document.querySelectorAll('img');
             allImgs.forEach(function(img) {
-                // 仅拦截非.qrcode-img类的图片右键
                 if (!img.classList.contains('qrcode-img')) {
                     img.addEventListener('contextmenu', function(e) {
-                        e.preventDefault(); // 阻止右键菜单弹出
+                        e.preventDefault();
                     });
-                    // 给图片容器也添加右键拦截，防止用户右键点击容器空白处
                     const parentContainer = img.closest('.img-clickable');
                     if (parentContainer) {
                         parentContainer.addEventListener('contextmenu', function(e) {
-                            // 排除二维码容器（此处无二维码，仅兜底）
                             if (!parentContainer.closest('.pay-qrcode')) {
                                 e.preventDefault();
                             }
@@ -663,31 +619,25 @@
                 }
             });
 
-            // ========== 新增：JS拦截复制/选择行为，兜底禁止文字复制 ==========
-            // 拦截鼠标拖拽选择文本
+            // 文字禁止复制拦截
             document.addEventListener('selectstart', function(e) {
-                // 仅允许二维码区域选择，其他区域禁止
                 if (!e.target.closest('.pay-qrcode')) {
                     e.preventDefault();
                 }
             });
 
-            // 拦截快捷键复制（Ctrl+C/Command+C）
             document.addEventListener('keydown', function(e) {
-                // 仅允许二维码区域使用复制快捷键，其他区域禁止
                 if (!e.target.closest('.pay-qrcode') && ((e.ctrlKey && e.key === 'c') || (e.metaKey && e.key === 'c'))) {
                     e.preventDefault();
                 }
             });
 
-            // 拦截右键菜单（防止通过右键复制文字）
             document.addEventListener('contextmenu', function(e) {
-                // 仅允许二维码区域显示右键菜单，其他区域禁止
                 if (!e.target.closest('.pay-qrcode')) {
                     e.preventDefault();
                 }
             });
-        });
+        };
     </script>
 </body>
 </html>
