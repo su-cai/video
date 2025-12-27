@@ -37,7 +37,7 @@
         }
         /* 图片容器添加透明遮罩，阻止右键直接作用于图片 */
         .img-clickable {
-            position: relative;
+            position: relative; /* 作为伪元素的定位基准 */
             user-select: none;
         }
         .img-clickable::before, .img-clickable::after {
@@ -73,7 +73,7 @@
             object-fit: cover;
         }
 
-        /* 4:3比例容器（小图专用） */
+        /* 4:3比例容器（通用素材小图专用） */
         .aspect-ratio-4-3 {
             position: relative;
             width: 100%;
@@ -91,55 +91,65 @@
             object-fit: cover;
         }
 
-        /* 播放按钮样式：放大尺寸+红色描边+三角形完美居中 */
+        /* 核心方案：圆形按钮 + 三角超大右移（彻底解决偏左） */
+        /* 1. 圆形按钮：左下角固定定位 */
         .img-clickable::after {
             content: "";
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
+            bottom: 15px; /* 距离图片底部15px */
+            left: 15px; /* 距离图片左侧15px */
+            width: 40px; /* 圆形直径 */
+            height: 40px; /* 圆形直径 */
+            border-radius: 50%; /* 圆形 */
             background-color: rgba(0, 0, 0, 0.6);
-            border: 2px solid #ff4444;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            border: 1px solid #ff4444;
             z-index: 10;
             transition: all 0.3s ease;
         }
+
+        /* 2. 三角：超大右移，彻底远离左侧（核心调整） */
         .img-clickable::before {
             content: "";
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-45%, -50%);
+            /* 圆形圆心坐标：left=15px+20px（半径），bottom=15px+20px（半径） */
+            left: calc(15px + 20px); 
+            bottom: calc(15px + 20px);
+            /* 超大右移：-40%（比之前的-45%更靠右，满足多移动需求） */
+            transform: translate(-40%, 50%);
+            /* 三角样式 */
             border-style: solid;
-            border-width: 18px 0 18px 30px;
             border-color: transparent transparent transparent #ffffff;
+            border-width: 10px 0 10px 18px; /* 三角尺寸适配40px圆形 */
             z-index: 11;
             transition: all 0.3s ease;
         }
+
+        /* 小图（4:3）：同步超大右移，保持一致性 */
         .aspect-ratio-4-3.img-clickable::after {
-            width: 50px;
-            height: 50px;
-            border: 2px solid #ff4444;
+            width: 30px; /* 小圆形直径 */
+            height: 30px; /* 小圆形直径 */
         }
         .aspect-ratio-4-3.img-clickable::before {
-            border-width: 12px 0 12px 22px;
-            transform: translate(-45%, -50%);
+            /* 小圆形圆心坐标：left=15px+15px（半径），bottom=15px+15px（半径） */
+            left: calc(15px + 15px);
+            bottom: calc(15px + 15px);
+            /* 小图同步超大右移：-40% */
+            transform: translate(-40%, 50%);
+            border-width: 8px 0 8px 14px; /* 三角尺寸适配30px圆形 */
         }
+
+        /* 3. Hover效果：同步放大，右移状态不变 */
         .img-clickable:hover::after {
-            transform: translate(-50%, -50%) scale(1.1);
+            transform: scale(1.1);
             background-color: rgba(0, 0, 0, 0.8);
             border-color: #ff3333;
         }
         .img-clickable:hover::before {
-            transform: translate(-45%, -50%) scale(1.1);
+            /* Hover时保留超大右移，仅追加放大效果 */
+            transform: translate(-40%, 50%) scale(1.1);
         }
 
-        /* 轮播样式：彻底简化，仅保留必要样式，不干扰原生逻辑（关键修复） */
+        /* 轮播样式：彻底简化，仅保留必要样式，不干扰原生逻辑 */
         .carousel {
             width: 100%;
             padding: 0 8px;
@@ -312,7 +322,7 @@
     </style>
 </head>
 <body>
-    <!-- 轮播区域：保留双重保障，移除网络图片兜底 -->
+    <!-- 轮播区域：保留双重保障，仅本地图片 -->
     <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-indicators">
             <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
@@ -338,7 +348,7 @@
         </div>
     </div>
 
-    <!-- 两列小图：修正序号与本地图片匹配，移除网络图片兜底 -->
+    <!-- 两列小图：序号与本地图片匹配，仅本地图片 -->
     <div class="img-container">
         <!-- 第1行 -->
         <div class="img-row">
@@ -347,7 +357,7 @@
                     <div class="aspect-ratio-4-3 img-clickable">
                         <img src="small_1.jpg" alt="通用素材①">
                     </div>
-                    <div class="img-desc"> 喝醉酒的女同事 </div>
+                    <div class="img-desc">通用素材①</div>
                 </div>
             </div>
             <div class="img-col">
@@ -355,7 +365,7 @@
                     <div class="aspect-ratio-4-3 img-clickable">
                         <img src="small_2.jpg" alt="通用素材②">
                     </div>
-                    <div class="img-desc">通用素材②</div> <!-- 原⑤修正为② -->
+                    <div class="img-desc">通用素材②</div>
                 </div>
             </div>
         </div>
@@ -366,7 +376,7 @@
                     <div class="aspect-ratio-4-3 img-clickable">
                         <img src="small_3.jpg" alt="通用素材③">
                     </div>
-                    <div class="img-desc">通用素材③</div> <!-- 原②修正为③ -->
+                    <div class="img-desc">通用素材③</div>
                 </div>
             </div>
             <div class="img-col">
@@ -374,7 +384,7 @@
                     <div class="aspect-ratio-4-3 img-clickable">
                         <img src="small_4.jpg" alt="通用素材④">
                     </div>
-                    <div class="img-desc">通用素材④</div> <!-- 原⑥修正为④ -->
+                    <div class="img-desc">通用素材④</div>
                 </div>
             </div>
         </div>
@@ -385,7 +395,7 @@
                     <div class="aspect-ratio-4-3 img-clickable">
                         <img src="small_5.jpg" alt="通用素材⑤">
                     </div>
-                    <div class="img-desc">通用素材⑤</div> <!-- 原③修正为⑤ -->
+                    <div class="img-desc">通用素材⑤</div>
                 </div>
             </div>
             <div class="img-col">
@@ -393,7 +403,7 @@
                     <div class="aspect-ratio-4-3 img-clickable">
                         <img src="small_6.jpg" alt="通用素材⑥">
                     </div>
-                    <div class="img-desc">通用素材⑥</div> <!-- 原⑦修正为⑥ -->
+                    <div class="img-desc">通用素材⑥</div>
                 </div>
             </div>
         </div>
@@ -404,7 +414,7 @@
                     <div class="aspect-ratio-4-3 img-clickable">
                         <img src="small_7.jpg" alt="通用素材⑦">
                     </div>
-                    <div class="img-desc">通用素材⑦</div> <!-- 原④修正为⑦ -->
+                    <div class="img-desc">通用素材⑦</div>
                 </div>
             </div>
             <div class="img-col">
@@ -431,7 +441,7 @@
                     <div class="aspect-ratio-4-3 img-clickable">
                         <img src="small_10.jpg" alt="通用素材⑩">
                     </div>
-                    <div class="img-desc">通用素材⑩</div> <!-- 原⑬修正为⑩ -->
+                    <div class="img-desc">通用素材⑩</div>
                 </div>
             </div>
         </div>
@@ -442,7 +452,7 @@
                     <div class="aspect-ratio-4-3 img-clickable">
                         <img src="small_11.jpg" alt="通用素材⑪">
                     </div>
-                    <div class="img-desc">通用素材⑪</div> <!-- 原⑩修正为⑪ -->
+                    <div class="img-desc">通用素材⑪</div>
                 </div>
             </div>
             <div class="img-col">
@@ -450,7 +460,7 @@
                     <div class="aspect-ratio-4-3 img-clickable">
                         <img src="small_12.jpg" alt="通用素材⑫">
                     </div>
-                    <div class="img-desc">通用素材⑫</div> <!-- 原⑭修正为⑫ -->
+                    <div class="img-desc">通用素材⑫</div>
                 </div>
             </div>
         </div>
@@ -461,7 +471,7 @@
                     <div class="aspect-ratio-4-3 img-clickable">
                         <img src="small_13.jpg" alt="通用素材⑬">
                     </div>
-                    <div class="img-desc">通用素材⑬</div> <!-- 原⑪修正为⑬ -->
+                    <div class="img-desc">通用素材⑬</div>
                 </div>
             </div>
             <div class="img-col">
@@ -469,7 +479,7 @@
                     <div class="aspect-ratio-4-3 img-clickable">
                         <img src="small_14.jpg" alt="通用素材⑭">
                     </div>
-                    <div class="img-desc">通用素材⑭</div> <!-- 原⑮修正为⑭ -->
+                    <div class="img-desc">通用素材⑭</div>
                 </div>
             </div>
         </div>
@@ -480,7 +490,7 @@
                     <div class="aspect-ratio-4-3 img-clickable">
                         <img src="small_15.jpg" alt="通用素材⑮">
                     </div>
-                    <div class="img-desc">通用素材⑮</div> <!-- 原⑫修正为⑮ -->
+                    <div class="img-desc">通用素材⑮</div>
                 </div>
             </div>
             <div class="img-col">
@@ -494,14 +504,14 @@
         </div>
     </div>
 
-    <!-- 底部16:9图片：移除网络图片兜底 -->
+    <!-- 底部16:9图片：仅本地图片 -->
     <div class="bottom-big-img">
         <div class="aspect-ratio-16-9 img-clickable">
             <img src="bottom_big.jpg" alt="素材合集（底部大图）">
         </div>
     </div>
 
-    <!-- 付费弹窗：移除二维码网络兜底 -->
+    <!-- 付费弹窗：仅本地二维码 -->
     <div class="modal fade" id="payModal" tabindex="-1" aria-labelledby="payModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
